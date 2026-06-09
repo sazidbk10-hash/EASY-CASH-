@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 অ্যাডমিন প্যানেল</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f2e 100%);
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding-top: 100px;
+        }
+        .login-card {
+            background: #1c1f26;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        }
+        .login-card h1 {
+            color: #79c0ff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .admin-container { display: none; max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logout-btn {
+            background: #da3633;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #30363d;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            color: #79c0ff;
+            border-bottom-color: #79c0ff;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .panel {
+            background: #1c1f26;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .panel h2 {
+            color: #79c0ff;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-bottom: 2px solid #30363d;
+            padding-bottom: 15px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            width: 100%;
+        }
+        .btn-primary { background: #238636; color: white; }
+        .btn-danger { background: #da3633; color: white; }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #1c1f26;
+            border: 1px solid #30363d;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #79c0ff;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+        .message.show { display: block; }
+        .message.success {
+            background: rgba(63, 185, 80, 0.1);
+            color: #3fb950;
+            border: 1px solid #3fb950;
+        }
+        .message.error {
+            background: rgba(248, 81, 73, 0.1);
+            color: #f85149;
+            border: 1px solid #f85149;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="loginContainer">
+        <div class="login-card">
+            <h1>🔐 অ্যাডমিন লগইন</h1>
+            <input type="email" id="adminEmail" placeholder="ইমেইল">
+            <input type="password" id="adminPassword" placeholder="পাসওয়ার্ড">
+            <button class="login-btn" onclick="adminLogin()">🔓 লগইন</button>
+            <div id="loginMessage" class="message" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <div class="admin-container" id="adminContainer">
+        <div class="header">
+            <div>
+                <h1>🔐 অ্যাডমিন প্যানেল</h1>
+                <p style="font-size: 14px; opacity: 0.9;">সম্পূর্ণ গেম নিয়ন্ত্রণ</p>
+            </div>
+            <button class="logout-btn" onclick="adminLogout()">🚪 লগআউট</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 ড্যাশবোর্ড</button>
+            <button class="tab-btn" onclick="switchTab('payments')">💳 পেমেন্ট</button>
+            <button class="tab-btn" onclick="switchTab('transactions')">💸 লেনদেন</button>
+        </div>
+
+        <div id="dashboard" class="tab-content active">
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div style="color: #8b949e; font-size: 12px; margin-bottom: 10px;">💰 ব্যালেন্স</div>
+                    <div class="stat-value">৳<span id="dashBalance">0</span></div>
+                </div>
+                <div class="stat-card">
+                    <div style="color: #8b949e; font-size: 12px; margin-bottom: 10px;">⚡ ক্রাশ</div>
+                    <div class="stat-value"><span id="dashCrash">1.50</span>x</div>
+                </div>
+                <div class="stat-card">
+                    <div style="color: #8b949e; font-size: 12px; margin-bottom: 10px;">⏳ পেন্ডিং</div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div style="color: #8b949e; font-size: 12px; margin-bottom: 10px;">🎮 স্ট্যাটাস</div>
+                    <div class="stat-value" id="gameStatus">চালু</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>⚡ ক্রাশ মাল্টিপ্লায়ার</h2>
+                <input type="number" id="crashInput" value="1.50" min="1.01" max="99.99" step="0.01">
+                <button class="btn-primary" onclick="setCrash()">আপডেট</button>
+            </div>
+
+            <div class="panel">
+                <h2>🎮 গেম কন্ট্রোল</h2>
+                <button class="btn-danger" onclick="toggleGameStatus()" id="gameToggleBtn">❌ গেম বন্ধ করুন (70% লস)</button>
+                <p style="color: #8b949e; font-size: 12px; margin-top: 15px;">⚠️ সাবধান: এটি সব খেলোয়াড়ের 70% টাকা কেটে ফেলবে</p>
+            </div>
+
+            <div class="panel">
+                <h2>💰 ব্যালেন্স নিয়ন্ত্রণ</h2>
+                <input type="number" id="addAmount" placeholder="পরিমাণ" min="1">
+                <button class="btn-primary" onclick="addBalance()">➕ যোগ করুন</button>
+                <button class="btn-danger" onclick="subtractBalance()" style="margin-top: 10px;">➖ বিয়োগ করুন</button>
+            </div>
+        </div>
+
+        <div id="payments" class="tab-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="panel">
+                    <h2>💳 বিকাশ</h2>
+                    <input type="text" id="bkashNumber" placeholder="নম্বর">
+                    <button class="btn-primary" onclick="updateMethod('bkash')">সেভ</button>
+                </div>
+                <div class="panel">
+                    <h2>📱 নগদ</h2>
+                    <input type="text" id="nagadNumber" placeholder="নম্বর">
+                    <button class="btn-primary" onclick="updateMethod('nagad')">সেভ</button>
+                </div>
+                <div class="panel">
+                    <h2>🚀 রকেট</h2>
+                    <input type="text" id="rocketNumber" placeholder="নম্বর">
+                    <button class="btn-primary" onclick="updateMethod('rocket')">সেভ</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="transactions" class="tab-content">
+            <div class="panel">
+                <h2>💳 পেন্ডিং লেনদেন</h2>
+                <div id="transactionsList" style="color: #8b949e; text-align: center; padding: 40px;">কোনো লেনদেন নেই</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDpvwvH20xf9UmVGuRXK25_mijNiPnJKM",
+            authDomain: "avtor04-79021.firebaseapp.com",
+            projectId: "avtor04-79021",
+            storageBucket: "avtor04-79021.firebasestorage.app",
+            messagingSenderId: "346940293375",
+            appId: "1:346940293375:web:b4472c63841c5e61020cca"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let adminState = {
+            playerBalance: 0,
+            crashMultiplier: 1.5,
+            gameRunning: true,
+            paymentMethods: {
+                bkash: { number: '0' },
+                nagad: { number: '0' },
+                rocket: { number: '0' }
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('adminContainer').style.display = 'block';
+                loadAdminData();
+            } else {
+                document.getElementById('loginContainer').style.display = 'block';
+                document.getElementById('adminContainer').style.display = 'none';
+            }
+        });
+
+        window.adminLogin = function() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            if (!email || !password) {
+                showLoginMessage('সব ফিল্ড পূরণ করুন!', 'error');
+                return;
+            }
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => { showLoginMessage('✓ লগইন সফল!', 'success'); })
+                .catch(() => { showLoginMessage('❌ লগইন ব্যর্থ!', 'error'); });
+        };
+
+        window.adminLogout = function() {
+            signOut(auth);
+        };
+
+        function loadAdminData() {
+            const balanceRef = ref(db, 'playerBalance');
+            onValue(balanceRef, (snapshot) => {
+                adminState.playerBalance = snapshot.val() || 0;
+                document.getElementById('dashBalance').innerText = Math.floor(adminState.playerBalance);
+            });
+
+            const crashRef = ref(db, 'crashMultiplier');
+            onValue(crashRef, (snapshot) => {
+                adminState.crashMultiplier = snapshot.val() || 1.5;
+                document.getElementById('dashCrash').innerText = adminState.crashMultiplier.toFixed(2);
+                document.getElementById('crashInput').value = adminState.crashMultiplier;
+            });
+
+            const gameStatusRef = ref(db, 'gameStatus');
+            onValue(gameStatusRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    adminState.gameRunning = data.running !== false;
+                    updateGameUI();
+                }
+            });
+
+            const methodsRef = ref(db, 'paymentMethods');
+            onValue(methodsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    adminState.paymentMethods = data;
+                    document.getElementById('bkashNumber').value = data.bkash?.number || '';
+                    document.getElementById('nagadNumber').value = data.nagad?.number || '';
+                    document.getElementById('rocketNumber').value = data.rocket?.number || '';
+                }
+            });
+
+            const transactionsRef = ref(db, 'transactions');
+            onValue(transactionsRef, (snapshot) => {
+                const data = snapshot.val();
+                const transactions = data ? Object.entries(data).map(([key, val]) => ({ id: key, ...val })) : [];
+                const pending = transactions.filter(t => t.status === 'pending');
+                document.getElementById('pendingCount').innerText = pending.length;
+                displayTransactions(pending);
+            });
+        }
+
+        function updateGameUI() {
+            document.getElementById('gameStatus').innerText = adminState.gameRunning ? 'চালু' : 'বন্ধ';
+            document.getElementById('gameToggleBtn').innerText = adminState.gameRunning ? '❌ গেম বন্ধ করুন' : '✅ গেম চালু করুন';
+        }
+
+        window.toggleGameStatus = function() {
+            if (!confirm('নিশ���চিত? প্লেয়ারদের 70% টাকা কাটা হবে!')) return;
+            adminState.gameRunning = !adminState.gameRunning;
+            if (!adminState.gameRunning) {
+                adminState.playerBalance -= adminState.playerBalance * 0.7;
+            }
+            set(ref(db, 'gameStatus'), { running: adminState.gameRunning, speed: 10 });
+            set(ref(db, 'playerBalance'), adminState.playerBalance);
+            updateGameUI();
+            showMessage(adminState.gameRunning ? '✓ গেম চালু!' : '❌ গেম বন্ধ! (70% কাট)', adminState.gameRunning ? 'success' : 'error');
+        };
+
+        window.setCrash = function() {
+            const value = parseFloat(document.getElementById('crashInput').value);
+            if (value < 1.01 || value > 99.99) {
+                showMessage('1.01-99.99 এর মধ্যে!', 'error');
+                return;
+            }
+            set(ref(db, 'crashMultiplier'), value);
+            showMessage(`✓ ক্রাশ: ${value.toFixed(2)}x`, 'success');
+        };
+
+        window.addBalance = function() {
+            const amount = parseFloat(document.getElementById('addAmount').value);
+            if (!amount) return;
+            set(ref(db, 'playerBalance'), adminState.playerBalance + amount);
+            document.getElementById('addAmount').value = '';
+        };
+
+        window.subtractBalance = function() {
+            const amount = parseFloat(document.getElementById('addAmount').value);
+            if (!amount) return;
+            set(ref(db, 'playerBalance'), Math.max(0, adminState.playerBalance - amount));
+            document.getElementById('addAmount').value = '';
+        };
+
+        window.updateMethod = function(method) {
+            const number = document.getElementById(method + 'Number').value;
+            if (!number) {
+                showMessage('নম্বর লিখুন!', 'error');
+                return;
+            }
+            adminState.paymentMethods[method].number = number;
+            set(ref(db, 'paymentMethods'), adminState.paymentMethods);
+            showMessage(`✓ ${method} আপডেট!`, 'success');
+        };
+
+        function displayTransactions(transactions) {
+            const container = document.getElementById('transactionsList');
+            if (transactions.length === 0) {
+                container.innerHTML = '<div style="color: #8b949e; text-align: center; padding: 40px;">কোনো লেনদেন নেই</div>';
+                return;
+            }
+            container.innerHTML = transactions.map(t => `
+                <div style="background: #0d1117; border: 1px solid #30363d; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: #79c0ff;">${t.type === 'deposit' ? '📥' : '📤'} ${t.amount}৳</span>
+                        <button style="background: #28a745; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; width: auto;" onclick="approveTransaction('${t.id}', ${t.amount}, '${t.type}')">অনুমোদন</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.approveTransaction = function(id, amount, type) {
+            let newBalance = adminState.playerBalance;
+            if (type === 'deposit') newBalance += amount;
+            else newBalance -= amount;
+            set(ref(db, 'playerBalance'), newBalance);
+            remove(ref(db, 'transactions/' + id));
+            showMessage('✓ অনুমোদিত!', 'success');
+        };
+
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        };
+
+        function showMessage(msg, type) {
+            const el = document.getElementById('message');
+            el.innerText = msg;
+            el.className = `message show ${type}`;
+            setTimeout(() => el.className = 'message', 3000);
+        }
+
+        function showLoginMessage(msg, type) {
+            const el = document.getElementById('loginMessage');
+            el.innerText = msg;
+            el.className = `message show ${type}`;
+            setTimeout(() => el.className = 'message', 3000);
+        }
+
+        set(ref(db, 'gameStatus'), { running: true, speed: 10 });
+    </script>
+</body>
+</html>
